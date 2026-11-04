@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>naver-research 스킬</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 한 줄 문서 컬럼. 설치 경로와 실측표가 주인공이고, 액션은 다운로드 하나뿐 */
+:root {
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --ink: #16191b;
+  --muted: #5b6468;
+  --line: #d9dfdd;
+  --accent: #1d4ed8;
+  --accent-ink: #ffffff;
+  --term-bg: #121619;
+  --term-fg: #dfe6e3;
+  --term-dim: #7f8b87;
+  --term-hi: #9fe0b8;
+  --ok: #17803d;
+  --ok-bg: #e3f3e8;
+  --key: #8a5a00;
+  --key-bg: #f8eccf;
+  --bad: #b42318;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1214; --surface: #171c1f; --ink: #e6ebe9; --muted: #98a3a0; --line: #2a3236;
+    --accent: #7aa2ff; --accent-ink: #0b1020;
+    --term-bg: #0a0d0f; --term-fg: #dfe6e3; --term-dim: #6f7b77; --term-hi: #9fe0b8;
+    --ok: #6fd393; --ok-bg: #16301f; --key: #f0c46a; --key-bg: #3a2d10; --bad: #ff8a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1214; --surface: #171c1f; --ink: #e6ebe9; --muted: #98a3a0; --line: #2a3236;
+  --accent: #7aa2ff; --accent-ink: #0b1020;
+  --term-bg: #0a0d0f; --term-fg: #dfe6e3; --term-dim: #6f7b77; --term-hi: #9fe0b8;
+  --ok: #6fd393; --ok-bg: #16301f; --key: #f0c46a; --key-bg: #3a2d10; --bad: #ff8a80;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  padding-inline: 16px;
+  padding-block: 0 64px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+code { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 0 0.3em; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+.lead { color: var(--muted); }
+
+/* hero */
+header { padding-top: 48px; display: flex; flex-direction: column; gap: 20px; }
+header h1 { font-family: var(--font-mono); font-weight: 500; font-size: clamp(2rem, 7vw, 3rem); letter-spacing: -0.02em; }
+header .tagline { font-size: 1.2rem; font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.btn {
+  font: inherit; font-weight: 700; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+  border: 0; border-radius: 8px; padding: 12px 22px;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:focus-visible, .copy:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn[disabled] { opacity: 0.6; cursor: default; }
+.meta { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.status { font-size: 0.9rem; min-height: 1.5em; }
+.status.err { color: var(--bad); }
+.status.ok { color: var(--ok); }
+
+/* terminal */
+.term {
+  background: var(--term-bg); color: var(--term-fg);
+  border-radius: 10px; padding: 18px 20px;
+  font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.65;
+  overflow-x: auto; min-width: 0;
+}
+.term pre { margin: 0; white-space: pre; }
+.term .dim { color: var(--term-dim); }
+.term .hi { color: var(--term-hi); }
+.term .you { color: var(--term-fg); font-weight: 700; }
+
+/* tables */
+.table-wrap { overflow-x: auto; min-width: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+td.mono { font-family: var(--font-mono); font-size: 0.84rem; }
+tr.this td { font-weight: 500; }
+.pill { display: inline-block; font-size: 0.78rem; font-weight: 500; border-radius: 999px; padding: 1px 10px; white-space: nowrap; }
+.pill.no { color: var(--bad); border: 1px solid currentColor; }
+.pill.yes { color: var(--ok); background: var(--ok-bg); }
+.pill.key { color: var(--key); background: var(--key-bg); }
+
+/* commands */
+.cmds { display: grid; gap: 14px; }
+.cmd { display: grid; grid-template-columns: 6.5rem 1fr; gap: 4px 16px; padding-block: 14px; border-top: 1px solid var(--line); }
+.cmd:first-child { border-top: 0; padding-top: 0; }
+.cmd .name { font-family: var(--font-mono); font-weight: 500; }
+.cmd > div { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.cmd .term { padding: 12px 14px; font-size: 0.78rem; }
+
+/* install tabs */
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tab { font: inherit; font-size: 0.9rem; cursor: pointer; background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 4px 12px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.codeline { position: relative; }
+.codeline .term { padding-right: 64px; }
+.copy {
+  position: absolute; top: 8px; right: 8px;
+  font: inherit; font-size: 0.75rem; cursor: pointer;
+  background: transparent; color: var(--term-dim); border: 1px solid var(--term-dim); border-radius: 5px; padding: 2px 8px;
+}
+.copy:hover { color: var(--term-fg); border-color: var(--term-fg); }
+.prompt-box { background: var(--surface); border: 1px solid var(--accent); border-radius: 10px; }
+.prompt-text { white-space: pre-wrap; font-size: 0.92rem; line-height: 1.7; padding: 44px 18px 16px; min-width: 0; }
+.prompt-box .copy { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight: 700; }
+.prompt-box .copy:hover { color: var(--accent-ink); filter: brightness(1.08); }
+ol.steps { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: 14px; }
+ol.steps li { padding-left: 4px; }
+ol.steps li > * + * { margin-top: 8px; }
+
+/* prompts */
+.prompts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.prompts li { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+.prompts .say { font-weight: 500; }
+.prompts .does { font-size: 0.85rem; color: var(--muted); }
+
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; }
+details > summary { cursor: pointer; font-weight: 500; }
+details[open] > summary { margin-bottom: 12px; }
+details > div { display: flex; flex-direction: column; gap: 12px; }
+
+.faq { display: flex; flex-direction: column; gap: 20px; }
+.faq h3 { margin-bottom: 4px; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+footer .credit { color: var(--ink); font-size: 0.95rem; }
+.byline { color: var(--muted); font-size: 0.95rem; margin-top: -8px; }
+.byline strong { color: var(--ink); }
+
+@media (max-width: 560px) {
+  .cmd { grid-template-columns: 1fr; }
+  th, td { padding: 8px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* Cowork 대화 예시 — 터미널 대신 앱 화면을 닮은 카드 */
+.chat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; font-size: 0.92rem; }
+.chat .me { align-self: flex-end; background: var(--bg); border-radius: 12px; padding: 8px 14px; font-weight: 500; }
+.chat .steps-box { border: 1px solid var(--line); border-radius: 8px; font-size: 0.85rem; color: var(--muted); }
+.chat .steps-box div { padding: 7px 12px; border-top: 1px solid var(--line); }
+.chat .steps-box div:first-child { border-top: 0; }
+.chat .steps-box b { color: var(--ink); font-weight: 500; }
+.chat .src { font-size: 0.82rem; color: var(--muted); }
+.path { font-weight: 500; }
+.path .sep { color: var(--muted); padding-inline: 4px; }
+.note { border-left: 3px solid var(--key); background: var(--key-bg); color: var(--ink); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.92rem; }
+
+/* 환경 전환 — 공통 내용은 한 번만, 설치·키·FAQ만 환경별로 */
+.wrap[data-env="code"] [data-only="cowork"],
+.wrap[data-env="cowork"] [data-only="code"] { display: none !important; }
+.env-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.env-btn {
+  font: inherit; text-align: left; cursor: pointer;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.env-btn .env-name { font-weight: 700; }
+.env-btn .env-desc { font-size: 0.82rem; color: var(--muted); }
+.env-btn[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.env-btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.env-label { font-size: 0.9rem; color: var(--muted); }
+.pill.only { color: var(--muted); border: 1px solid var(--line); }
+@media (max-width: 560px) { .env-switch { grid-template-columns: 1fr; } }
+a.btn { text-decoration: none; }
+</style>
+
+<div class="wrap" data-env="cowork">
+
+<header>
+  <span class="eyebrow">Claude 스킬 · Claude Code · Claude 앱</span>
+  <h1>naver-research</h1>
+  <p class="byline">만든 사람 <strong>박상권 (ted)</strong></p>
+  <p class="tagline">
+    Claude가 네이버 블로그를 검색하고 본문 전문까지 읽게 해 주는 스킬입니다.
+  </p>
+  <p class="lead">
+    맛집·여행·제품 후기처럼 한국 사람들의 실사용 경험은 대부분 네이버 블로그에 있습니다.
+    그런데 Claude는 기본 상태로는 그 글을 열지 못합니다.
+    이 스킬을 설치하면 "블로그 후기 모아줘"라고 말하는 것만으로 검색, 본문 읽기, 상위노출 분석까지 해 줍니다.
+  </p>
+  <div class="cta">
+    <a class="btn" href="https://github.com/ParkSangGwon/naver-research" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+      GitHub 저장소
+    </a>
+    <span class="meta">ParkSangGwon/naver-research</span>
+  </div>
+
+  <div class="chat" aria-label="쓰는 예시">
+    <span class="me">강릉 카페 블로그 후기 모아줘</span>
+    <div class="steps-box">
+      <div>스킬 불러옴 <b>naver-research</b></div>
+      <div>네이버 블로그 상위 15건 검색</div>
+      <div>그중 9건 본문 전체 읽기</div>
+    </div>
+    <p>최근 일주일 사이 후기 15건 중 5건이 툇마루 이야기일 만큼 압도적이에요.</p>
+    <p>시그니처는 흑임자 크림을 올린 툇마루커피이고, 화요일은 쉽니다.</p>
+    <p>바다를 보며 조용히 앉고 싶다면 사근진해변의 백야커피, 아이와 간다면 공간이 넓은 346커피스토리가 편하다는 후기가 많았어요.</p>
+    <p class="src">출처 9건 · blog.naver.com</p>
+  </div>
+</header>
+
+<section id="install">
+  <span class="eyebrow">설치</span>
+  <h2>어디서 쓰시나요?</h2>
+  <p class="env-label">저장소는 하나이고 설치 방법만 다릅니다.</p>
+  <div class="env-switch" role="tablist" aria-label="설치할 곳">
+    <button class="env-btn" role="tab" type="button" data-env="cowork" aria-selected="true">
+      <span class="env-name">Claude 앱 (Cowork)</span>
+      <span class="env-desc">데스크톱 앱에서 대화로 쓰기 · 프로그램 설치 없음</span>
+    </button>
+    <button class="env-btn" role="tab" type="button" data-env="code" aria-selected="false">
+      <span class="env-name">Claude Code</span>
+      <span class="env-desc">터미널 · IDE · 데스크톱 앱의 Code 탭 · Node.js 18+</span>
+    </button>
+  </div>
+
+  <div data-only="cowork">
+    <ol class="steps">
+      <li>
+        <p>Claude 데스크톱 앱에서 저장소를 마켓플레이스로 추가합니다.</p>
+        <p class="path">왼쪽 사이드바 <span class="sep">›</span> 사용자 지정 <span class="sep">›</span> 플러그인 탭 <span class="sep">›</span> 오른쪽 위 + 추가 <span class="sep">›</span> 마켓플레이스 추가 <span class="sep">›</span> 저장소에서 추가</p>
+        <p>URL 칸에 아래 주소를 붙여 넣고, 목록에 뜬 "…사용"을 고른 뒤 <strong>동기화</strong>를 누릅니다.</p>
+        <div class="codeline"><div class="term"><pre>https://github.com/ParkSangGwon/naver-research</pre></div><button class="copy" type="button">복사</button></div>
+      </li>
+      <li>
+        <p>목록에 나온 <strong>Naver research</strong> 옆의 <strong>추가</strong>를 누릅니다.</p>
+        <p class="lead">"코드를 실행하는 구성 요소가 포함되어 있습니다" 안내가 뜨면 <strong>계속</strong>을 누릅니다.
+          네이버에 접속하는 작은 스크립트가 들어 있어서 뜨는 안내입니다.</p>
+      </li>
+      <li>
+        <p>네이버를 허용 목록에 넣습니다.</p>
+        <p class="path">왼쪽 아래 내 이름 <span class="sep">›</span> 설정 <span class="sep">›</span> 기능 <span class="sep">›</span> 코드 실행 및 파일 생성</p>
+        <p><strong>추가 허용 도메인</strong> 칸에 아래 두 개를 하나씩 넣고 그때마다 <strong>추가</strong>를 누릅니다.</p>
+        <div class="codeline"><div class="term"><pre>*.naver.com</pre></div><button class="copy" type="button">복사</button></div>
+        <div class="codeline"><div class="term"><pre>*.pstatic.net</pre></div><button class="copy" type="button">복사</button></div>
+        <p class="lead">같은 화면의 "클라우드에서 코드 실행"과 "외부 네트워크 접속 허용"은 켜져 있어야 합니다.</p>
+      </li>
+      <li>
+        <p><strong>새 대화</strong>를 열어 써 봅니다.</p>
+        <p class="lead">설정을 바꾸기 전에 열어 둔 대화에는 반영되지 않습니다.</p>
+      </li>
+    </ol>
+    <p class="note">회사 계정(Team·Enterprise)은 네트워크 설정을 관리자만 바꿀 수 있습니다.
+      관리자에게 위 두 도메인을 허용해 달라고 요청하세요.</p>
+  </div>
+
+  <div data-only="code">
+    <ol class="steps">
+      <li>
+        <p>터미널에서 <code>node --version</code>을 쳐서 v18 이상인지 확인합니다.
+          안 나오면 <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>에서 LTS를 설치합니다.</p>
+      </li>
+      <li>
+        <p>터미널에서 아래 두 줄을 실행합니다.</p>
+        <div class="codeline"><div class="term"><pre>claude plugin marketplace add ParkSangGwon/naver-research
+claude plugin install naver-research@naver-research</pre></div><button class="copy" type="button" data-copy="claude plugin marketplace add ParkSangGwon/naver-research && claude plugin install naver-research@naver-research">복사</button></div>
+      </li>
+      <li>
+        <p>Claude Code를 새로 열어 써 봅니다.</p>
+      </li>
+    </ol>
+    <details>
+      <summary>네이버 API 키 등록 (선택 · 뉴스·대량 수집·쇼핑용)</summary>
+      <div>
+        <p>키가 없어도 블로그 검색, 본문 읽기, 상위노출 분석, 이미지 받기는 됩니다.
+          키가 필요한 기능을 쓰는 순간 스킬이 발급 방법을 안내하며 멈춥니다.</p>
+        <ol class="steps">
+          <li><a href="https://developers.naver.com/apps" target="_blank" rel="noopener">developers.naver.com/apps</a>에서 애플리케이션을 등록합니다.
+            사용 API는 "검색"을 고릅니다.</li>
+          <li>발급된 Client ID와 Client Secret을 <code>~/.config/naver/.env</code> 파일에 저장합니다.</li>
+        </ol>
+        <div class="codeline"><div class="term"><pre>NAVER_CLIENT_ID=발급받은_ID
+NAVER_CLIENT_SECRET=발급받은_Secret</pre></div><button class="copy" type="button" data-copy="NAVER_CLIENT_ID=
+NAVER_CLIENT_SECRET=">복사</button></div>
+        <p>무료 사용량은 하루 25,000회입니다.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section id="features">
+  <span class="eyebrow">할 수 있는 것</span>
+  <h2>블로그 조사는 어디서든 됩니다</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>기능</th><th>Claude Code</th><th>Claude 앱</th></tr></thead>
+      <tbody>
+        <tr><td>블로그 검색 (네이버 순위 그대로, 인플루언서 표시)</td><td><span class="pill yes">됨</span></td><td><span class="pill yes">됨</span></td></tr>
+        <tr><td>본문 전문 읽기 (PC·모바일 주소 모두)</td><td><span class="pill yes">됨</span></td><td><span class="pill yes">됨</span></td></tr>
+        <tr><td>상위노출 분석</td><td><span class="pill yes">됨</span></td><td><span class="pill yes">됨</span></td></tr>
+        <tr><td>이미지 받기 (최대 가로 800px)</td><td><span class="pill yes">됨</span></td><td><span class="pill yes">됨</span></td></tr>
+        <tr><td>뉴스 검색</td><td><span class="pill key">API 키</span></td><td><span class="pill only">안 됨</span></td></tr>
+        <tr><td>최신순 31건 이상 대량 수집</td><td><span class="pill key">API 키</span></td><td><span class="pill only">안 됨</span></td></tr>
+        <tr><td>쇼핑 검색</td><td><span class="pill key">API 키</span></td><td><span class="pill only">안 됨</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="usage">
+  <span class="eyebrow">쓰는 법</span>
+  <h2>명령어를 외울 필요 없이 말하면 됩니다</h2>
+  <ul class="prompts">
+    <li><span class="say">강릉 카페 블로그 후기 모아줘</span><span class="does">검색 → 상위 글 본문 읽기 → 출처 붙여 정리</span></li>
+    <li><span class="say">이 블로그 글 요약해줘 https://blog.naver.com/…</span><span class="does">본문 전문을 읽고 요약</span></li>
+    <li><span class="say">'제주 렌트카' 상위노출 누가 먹고 있어?</span><span class="does">상위 30건 순위표와 인플루언서 비율·발행 시점 분석</span></li>
+    <li><span class="say">이 글 사진 다 받아줘 https://blog.naver.com/…</span><span class="does">Claude Code는 현재 폴더 images/에 저장, Claude 앱은 zip으로 묶어 대화에 첨부</span></li>
+  </ul>
+</section>
+
+<section id="faq">
+  <span class="eyebrow">자주 묻는 것</span>
+  <h2>문제가 생기면</h2>
+  <div class="faq">
+    <div>
+      <h3>Claude 앱에서 네이버에 접속할 수 없다고 나와요</h3>
+      <p>허용 도메인 단계가 빠졌거나, 설정을 바꾸기 전에 열어 둔 대화에서 쓴 경우입니다.
+        두 도메인이 목록에 있는지 확인하고 새 대화를 여세요.
+        이때 Claude가 Chrome 브라우저 권한을 달라고 하면 거부해도 됩니다.</p>
+    </div>
+    <div>
+      <h3>새 버전은 어떻게 받나요?</h3>
+      <p>Claude 앱은 사용자 지정 › 플러그인 › Naver research 화면의 <strong>업데이트</strong>를 누릅니다.
+        Claude Code는 <code>claude plugin marketplace update naver-research</code> 뒤 <code>claude plugin update naver-research@naver-research</code>를 실행합니다.</p>
+    </div>
+    <div>
+      <h3>제목이나 블로거명이 비어 있거나 본문을 못 찾아요</h3>
+      <p>제목이 비면 네이버가 검색 화면 구조를 바꾼 경우이고, 본문을 못 찾으면 비공개나 삭제된 글입니다.
+        저장소에 알려 주시면 고치겠습니다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="caution">
+  <span class="eyebrow">주의</span>
+  <h2>개인 조사용으로만 써 주세요</h2>
+  <p>필요한 글 몇십 건을 읽고 정리하는 용도로 만들었습니다.
+    대량 수집, DB 구축, 차단 우회에는 쓰지 마세요.</p>
+</section>
+
+<footer>
+  <p class="credit">naver-research는 <strong>박상권 (ted)</strong>이 만들었습니다.
+    링크를 다른 곳에 옮겨 공유할 때도 이 출처를 함께 남겨 주세요.</p>
+  <p>2026년 11월 macOS의 Claude Code와 Claude 데스크톱 앱(Cowork)에서 확인했습니다.</p>
+</footer>
+
+</div>
+
+<script>
+(() => {
+  // #code·#cowork로 설치 탭을 바로 열어 주는 링크를 줄 수 있게 한다
+  const wrap = document.querySelector('.wrap');
+  const envButtons = document.querySelectorAll('.env-btn');
+  const setEnv = (env) => {
+    wrap.dataset.env = env;
+    envButtons.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.env === env)));
+  };
+  const envFromHash = () => {
+    const env = location.hash.slice(1);
+    if (env === 'code' || env === 'cowork') {
+      setEnv(env);
+      document.getElementById('install').scrollIntoView();
+    }
+  };
+  envButtons.forEach((b) => b.addEventListener('click', () => {
+    setEnv(b.dataset.env);
+    history.replaceState(null, '', '#' + b.dataset.env);
+  }));
+  addEventListener('hashchange', envFromHash);
+  envFromHash();
+
+  document.querySelectorAll('.copy').forEach((button) => button.addEventListener('click', async () => {
+    const text = button.dataset.copy ?? button.previousElementSibling.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = '복사됨';
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(button.previousElementSibling);
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      button.textContent = '선택됨';
+    }
+    setTimeout(() => { button.textContent = '복사'; }, 1500);
+  }));
+})();
+</script>

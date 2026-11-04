@@ -25,25 +25,28 @@ Claude Code와 Claude 데스크톱 앱(Cowork) 양쪽에서 이 저장소 하나
 
 ## 설치 — Claude 앱 (Cowork)
 
-1. 왼쪽 사이드바 "사용자 지정" > 플러그인 탭 > "+ 추가" > "마켓플레이스 추가" > "저장소에서 추가"를 고르고 `ParkSangGwon/naver-research`를 넣는다.
-2. 목록에 나온 `naver-research` 플러그인을 설치한다.
+1. 왼쪽 사이드바 "사용자 지정" > 플러그인 탭 > "+ 추가" > "마켓플레이스 추가" > "저장소에서 추가"를 고른다.
+   URL 칸에 `https://github.com/ParkSangGwon/naver-research`를 붙여 넣고 "동기화"를 누른다.
+2. 목록에 나온 "Naver research"의 "추가"를 누른다.
+   코드를 실행하는 구성 요소가 있다는 안내가 뜨면 "계속"을 누른다.
 3. 왼쪽 아래 내 이름 > 설정 > 기능 > "코드 실행 및 파일 생성"의 "추가 허용 도메인"에 `*.naver.com`과 `*.pstatic.net`을 하나씩 추가한다.
 4. 새 대화를 열어 쓴다.
    설정을 바꾸기 전에 열어 둔 대화에는 반영되지 않는다.
 
 회사 계정(Team·Enterprise)은 네트워크 설정을 관리자만 바꿀 수 있다.
+새 버전은 플러그인 화면의 "업데이트"로 받는다.
 
 ## 설치 — Claude Code
 
 Node.js 18 이상이 필요하다 (`node --version`).
 
 ```
-/plugin marketplace add ParkSangGwon/naver-research
-/plugin install naver-research@naver-research
+claude plugin marketplace add ParkSangGwon/naver-research
+claude plugin install naver-research@naver-research
 ```
 
 설치 뒤 Claude Code를 새로 열면 된다.
-업데이트는 `/plugin marketplace update naver-research`로 받는다.
+업데이트는 `claude plugin marketplace update naver-research` 뒤 `claude plugin update naver-research@naver-research`로 받는다.
 
 ### 네이버 Open API 키 (선택)
 
