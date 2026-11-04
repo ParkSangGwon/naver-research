@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "naver-research",
+  "owner": {
+    "name": "박상권 (ted)"
+  },
+  "metadata": {
+    "description": "Claude가 네이버 블로그를 검색하고 본문 전문까지 읽게 해 주는 스킬"
+  },
+  "plugins": [
+    {
+      "name": "naver-research",
+      "source": "./",
+      "description": "네이버 블로그 검색·본문 읽기·상위노출 분석·이미지 받기 (Claude Code · Claude 앱 Cowork)",
+      "author": {
+        "name": "박상권 (ted)"
+      },
+      "category": "research"
+    }
+  ]
+}

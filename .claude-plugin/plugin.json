@@ -1,0 +1,11 @@
+{
+  "name": "naver-research",
+  "description": "Claude가 네이버 블로그를 검색하고 본문 전문까지 읽게 해 주는 스킬 — 검색·본문 읽기·상위노출 분석·이미지 받기",
+  "author": {
+    "name": "박상권 (ted)"
+  },
+  "homepage": "https://github.com/ParkSangGwon/naver-research",
+  "repository": "https://github.com/ParkSangGwon/naver-research",
+  "keywords": ["naver", "blog", "korean", "research"],
+  "skills": ["./skills/naver-research"]
+}
